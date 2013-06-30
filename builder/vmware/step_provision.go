@@ -12,6 +12,15 @@ func (*stepProvision) Run(state map[string]interface{}) multistep.StepAction {
 	comm := state["communicator"].(packer.Communicator)
 	hook := state["hook"].(packer.Hook)
 	ui := state["ui"].(packer.Ui)
+	driver := state["driver"].(Driver)
+	vmxPath := state["vmx_path"].(string)
+
+	if err := driver.MountTools(vmxPath); err != nil {
+		err := fmt.Errorf("Error mounting the VMWare Tools on VM: %s", err)
+		state["error"] = err
+		ui.Error(err.Error())
+		return multistep.ActionHalt
+	}
 
 	log.Println("Running the provision hook")
 	if err := hook.Run(packer.HookProvision, ui, comm, nil); err != nil {

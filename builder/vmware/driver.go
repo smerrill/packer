@@ -24,6 +24,9 @@ type Driver interface {
 	// Stop stops a VM specified by the path to the VMX given.
 	Stop(string) error
 
+	// Mounts the VMWare tools
+	MountTools(string) error
+
 	// Verify checks to make sure that this driver should function
 	// properly. This should check that all the files it will use
 	// appear to exist and so on. If everything is okay, this doesn't
@@ -69,6 +72,15 @@ func (d *Fusion5Driver) IsRunning(vmxPath string) (bool, error) {
 
 func (d *Fusion5Driver) Start(vmxPath string) error {
 	cmd := exec.Command(d.vmrunPath(), "-T", "fusion", "start", vmxPath, "gui")
+	if _, _, err := d.runAndLog(cmd); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *Fusion5Driver) MountTools(vmxPath string) error {
+	cmd := exec.Command(d.vmrunPath(), "-T", "fusion", "installTools", vmxPath)
 	if _, _, err := d.runAndLog(cmd); err != nil {
 		return err
 	}
