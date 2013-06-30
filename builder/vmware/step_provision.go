@@ -4,6 +4,7 @@ import (
 	"github.com/mitchellh/multistep"
 	"github.com/mitchellh/packer/packer"
 	"log"
+	"fmt"
 )
 
 type stepProvision struct{}
@@ -15,6 +16,7 @@ func (*stepProvision) Run(state map[string]interface{}) multistep.StepAction {
 	driver := state["driver"].(Driver)
 	vmxPath := state["vmx_path"].(string)
 
+	ui.Say("Mounting the VMware tools")
 	if err := driver.MountTools(vmxPath); err != nil {
 		err := fmt.Errorf("Error mounting the VMWare Tools on VM: %s", err)
 		state["error"] = err

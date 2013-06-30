@@ -81,7 +81,7 @@ func (d *Fusion5Driver) Start(vmxPath string) error {
 
 func (d *Fusion5Driver) MountTools(vmxPath string) error {
 	cmd := exec.Command(d.vmrunPath(), "-T", "fusion", "installTools", vmxPath)
-	if _, _, err := d.runAndLog(cmd); err != nil {
+	if err := d.startAndLog(cmd); err != nil {
 		return err
 	}
 
@@ -131,6 +131,13 @@ func (d *Fusion5Driver) vdiskManagerPath() string {
 
 func (d *Fusion5Driver) vmrunPath() string {
 	return filepath.Join(d.AppPath, "Contents", "Library", "vmrun")
+}
+
+func (d *Fusion5Driver) startAndLog(cmd *exec.Cmd) (error) {
+	log.Printf("Executing: %s %v", cmd.Path, cmd.Args[1:])
+	err := cmd.Start()
+
+	return err
 }
 
 func (d *Fusion5Driver) runAndLog(cmd *exec.Cmd) (string, string, error) {
